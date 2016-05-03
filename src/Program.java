@@ -1,8 +1,12 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+
+import com.google.common.io.Files;
+import com.opencsv.CSVWriter;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.sql.*;
 
 /**
  * Created by sadasik on 5/1/16.
@@ -10,43 +14,64 @@ import java.sql.Statement;
 public class Program {
 
     public static void main(String[] args){
-        String filePath = System.getProperty("user.dir") + "/data/Customers.csv";
+        String inMemHSQLDBUrl = "jdbc:hsqldb:mem:mymemdb";
+        String dbUserName = "sa";
+        String dbPassword = "";
+
+        String rootDir = System.getProperty("user.dir");
+        String dataFile =  rootDir + "/data/Customers.csv";
+        String outFile = rootDir + "/data/out.csv";
+        String createTableQuery = toSqlQueryString(rootDir + "/sqlQueries/createTable.sql");
+        String importTableQuery = toSqlQueryString(rootDir + "/sqlQueries/importFileAsTable.sql");
+        String queryTable = toSqlQueryString(rootDir + "/sqlQueries/queryTable.sql");
 
         try{
-            System.setProperty("textdb.allow_full_path", "true");
-            Connection conn = DriverManager.getConnection("jdbc:hsqldb:mem:mymemdb", "SA", "");
+            // get HSQL DB connection.
+            Connection conn = getHSQLDBConnection(inMemHSQLDBUrl, dbUserName, dbPassword);
 
-            createTable(conn);
+            // create the table.
+            executeQuery(conn, createTableQuery);
 
-            Statement stms = conn.createStatement();
-            stms.executeUpdate("set table Customers source '"+ filePath +"';");
+            // import the table.
+            executeQuery(conn, String.format(importTableQuery, dataFile));
 
-            printTableData(conn, "SELECT * FROM PUBLIC.Customers");
+            // query and save the output.
+            queryAndSaveOutput(conn, queryTable, outFile);
 
         } catch (Exception e){
             Print(e.getStackTrace().toString());
         }
     }
 
-    private static void createTable(Connection conn) throws SQLException {
-        Statement stmt = conn.createStatement();
-        String sql = "CREATE TEXT TABLE PUBLIC.Customers " +
-                "(id INTEGER not NULL, " +
-                " first VARCHAR(255), " +
-                " last VARCHAR(255), " +
-                " PRIMARY KEY ( id ))";
+    private static Connection getHSQLDBConnection(String inMemHSQLDBUrl, String dbUserName, String dbPassword) throws ClassNotFoundException, SQLException {
+        // register HSQLDB JDBC drive.
+        Class.forName("org.hsqldb.jdbcDriver");
 
-        stmt.executeUpdate(sql);
+        // allow loading files as tables into mem db from a directory.
+        System.setProperty("textdb.allow_full_path", "true");
+
+        return DriverManager.getConnection(inMemHSQLDBUrl, dbUserName, dbPassword);
     }
 
-    private static void printTableData(Connection conn, String query) throws SQLException {
+    private static void executeQuery(Connection conn, String query) throws SQLException{
+        Statement statement = conn.createStatement();
+        statement.executeUpdate(query);
+    }
+
+    private static void queryAndSaveOutput(Connection conn, String query, String outFile) throws Exception {
         Statement stmt = conn.createStatement();
         ResultSet result = stmt.executeQuery(query);
-        int columnCount = result.getMetaData().getColumnCount();
-        while(result.next()){
-            for (int i = 1; i <= columnCount; i++){
-                Print(result.getString(i));
-            }
+        FileWriter fileWriter = new FileWriter(outFile);
+        CSVWriter csvWriter = new CSVWriter(fileWriter, ',', CSVWriter.NO_QUOTE_CHARACTER);
+        csvWriter.writeAll(result,true, true);
+        csvWriter.close();
+    }
+
+    private static String toSqlQueryString(String file) {
+        try{
+            return Files.toString(new File(file), Charset.defaultCharset());
+        } catch (IOException e){
+            return "";
         }
     }
 

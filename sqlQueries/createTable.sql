@@ -1,0 +1,1 @@
+CREATE TEXT TABLE Customers (id INTEGER not NULL, first VARCHAR(255), last VARCHAR(255), PRIMARY KEY ( id ))
