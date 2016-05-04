@@ -1,4 +1,8 @@
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
+
 import java.io.*;
+import java.util.List;
 
 /**
  * Created by sadasik on 5/3/16.
@@ -57,17 +61,50 @@ public class Transposer {
     }
 
     public void transpose() throws Exception {
+        Joiner joiner = Joiner.on(",");
         BufferedReader reader = new BufferedReader(new FileReader(this.fileName));
         BufferedWriter writer = new BufferedWriter(new FileWriter(this.outFileName));
 
         // read the first line to get the column metadata
         String columnMetadataString = reader.readLine();
-        String[] columnMetadata = columnMetadataString.split(",");
+        List<String> columnMetadata = Lists.newArrayList(columnMetadataString.split(","));
 
-        // split the array at dataIndex
+        // get the non data column as string
+        String newTableColumn = joiner.join(columnMetadata.subList(0, dataIndex)) + ",week,value";
+        writer.write(newTableColumn);
+        writer.newLine();
+
+        String rowString = null;
+        // read each row
+        while((rowString = reader.readLine()) != null){
+            List<String> row = Lists.newArrayList(rowString.split(","));
+
+            // validation
+            if(columnMetadata.size() != row.size()) {
+                log("row doesn't match column size: " + rowString);
+                continue;
+            }
+
+            // get the first row part till the week data
+            String outTableRowPart1 = joiner.join(row.subList(0, dataIndex)) + ",";
+
+            for(int i = dataIndex; i < row.size(); i++) {
+                // transpose the row data into column
+                String outTableRowPart2 = columnMetadata.get(i) + "," + row.get(i);
+                String outTableRow = outTableRowPart1 + outTableRowPart2;
+
+                // write to the outfile
+                writer.write(outTableRow);
+                writer.newLine();
+            }
+        }
 
         writer.flush();
         writer.close();
         reader.close();
+    }
+
+    private static void log(String s) {
+        System.out.println(s);
     }
 }
