@@ -26,11 +26,11 @@ public class Program {
         int zeroBasedDataIndex = followUpRatesDataIndex;
 
         String rootDir = System.getProperty("user.dir");
-        String toBeTransposedDataFile =  rootDir + "/../../Documents/crucible/" + "1aFollowUpRates.csv"; //"1aRawVolFcst.csv";
-        String dataFile = rootDir + "/../../Documents/crucible/" + "1aFollowUpRatesInput.csv"; //"1aRawVolFcstInput.csv";
-        //String toBeTransposedDataFile = rootDir + "/data/Customers.csv";
-        //String dataFile = rootDir + "/data/Customers_Transposed.csv";
-        String outFile = rootDir + "/../../Documents/crucible/out.csv";
+      //  String toBeTransposedDataFile =  rootDir + "/../../Documents/crucible/sandbox/" + "1aFollowUpRates.csv";
+      //  String dataFile = rootDir + "/../../Documents/crucible/sandbox/" + "1aFollowUpRatesInput.csv";
+        String toBeTransposedDataFile =  rootDir + "/../../Documents/crucible/sandbox/1aRawVolFcst.csv";
+        String dataFile = rootDir + "/../../Documents/crucible/sandbox/1aRawVolFcstInput.csv";
+        String outFile = rootDir + "/../../Documents/crucible/sandbox/out.csv";
         String createTableQuery = toSqlQueryString(rootDir + "/sqlQueries/createTable.sql");
         String importTableQuery = toSqlQueryString(rootDir + "/sqlQueries/importFileAsTable.sql");
         String queryTable = toSqlQueryString(rootDir + "/sqlQueries/queryTable.sql");
