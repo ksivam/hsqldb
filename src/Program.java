@@ -1,4 +1,5 @@
 
+import com.google.common.base.Stopwatch;
 import com.google.common.io.Files;
 import com.opencsv.CSVWriter;
 
@@ -7,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.sql.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by sadasik on 5/1/16.
@@ -18,11 +20,17 @@ public class Program {
         String dbUserName = "sa";
         String dbPassword = "";
 
+        int rawVolFcstDataIndex = 8;
+        int followUpRatesDataIndex = 8;
+
+        int zeroBasedDataIndex = followUpRatesDataIndex;
+
         String rootDir = System.getProperty("user.dir");
-        //String dataFile =  rootDir + "/../../Documents/crucible/RawVolFcst.csv";
-        String dataFile = rootDir + "/data/Customers.csv";
-        String transposedDataFile = rootDir + "/data/Customers_Transposed.csv";
-        String outFile = rootDir + "/data/out.csv";
+        String toBeTransposedDataFile =  rootDir + "/../../Documents/crucible/" + "1aFollowUpRates.csv"; //"1aRawVolFcst.csv";
+        String dataFile = rootDir + "/../../Documents/crucible/" + "1aFollowUpRatesInput.csv"; //"1aRawVolFcstInput.csv";
+        //String toBeTransposedDataFile = rootDir + "/data/Customers.csv";
+        //String dataFile = rootDir + "/data/Customers_Transposed.csv";
+        String outFile = rootDir + "/../../Documents/crucible/out.csv";
         String createTableQuery = toSqlQueryString(rootDir + "/sqlQueries/createTable.sql");
         String importTableQuery = toSqlQueryString(rootDir + "/sqlQueries/importFileAsTable.sql");
         String queryTable = toSqlQueryString(rootDir + "/sqlQueries/queryTable.sql");
@@ -30,20 +38,26 @@ public class Program {
         try{
 
             // transpose the input files.
-            Transposer transposer = new Transposer(dataFile, 4).withOutputFileName(transposedDataFile);
+            Transposer transposer = new Transposer(toBeTransposedDataFile, zeroBasedDataIndex).withOutputFileName(dataFile);
             transposer.transpose();
 
-            // get HSQL DB connection.
-            Connection conn = getHSQLDBConnection(inMemHSQLDBUrl, dbUserName, dbPassword);
+            if(false) {
+                Stopwatch watch = Stopwatch.createStarted();
 
-            // create the table.
-            executeQuery(conn, createTableQuery);
+                // get HSQL DB connection.
+                Connection conn = getHSQLDBConnection(inMemHSQLDBUrl, dbUserName, dbPassword);
 
-            // import the table.
-            executeQuery(conn, String.format(importTableQuery, dataFile));
+                // create the table.
+                executeQuery(conn, createTableQuery);
 
-            // query and save the output.
-            queryAndSaveOutput(conn, queryTable, outFile);
+                // import the table.
+                executeQuery(conn, String.format(importTableQuery, dataFile));
+
+                // query and save the output.
+                queryAndSaveOutput(conn, queryTable, outFile);
+
+                Print("sql query elapsed time in ms: " + watch.elapsed(TimeUnit.MILLISECONDS));
+            }
 
         } catch (Exception e){
             Print(e.getStackTrace().toString());

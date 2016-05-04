@@ -1,1 +1,1 @@
-set table Customers source '%s'
+set table RawVolFcst source '%s;ignore_first=true'

@@ -1,8 +1,11 @@
 import com.google.common.base.Joiner;
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 
 import java.io.*;
 import java.util.List;
+import java.util.Timer;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by sadasik on 5/3/16.
@@ -61,6 +64,8 @@ public class Transposer {
     }
 
     public void transpose() throws Exception {
+        Stopwatch watch = Stopwatch.createStarted();
+
         Joiner joiner = Joiner.on(",");
         BufferedReader reader = new BufferedReader(new FileReader(this.fileName));
         BufferedWriter writer = new BufferedWriter(new FileWriter(this.outFileName));
@@ -70,7 +75,7 @@ public class Transposer {
         List<String> columnMetadata = Lists.newArrayList(columnMetadataString.split(","));
 
         // get the non data column as string
-        String newTableColumn = joiner.join(columnMetadata.subList(0, dataIndex)) + ",week,value";
+        String newTableColumn = joiner.join(columnMetadata.subList(0, dataIndex)) + ",week,val";
         writer.write(newTableColumn);
         writer.newLine();
 
@@ -102,6 +107,9 @@ public class Transposer {
         writer.flush();
         writer.close();
         reader.close();
+
+        watch.stop();
+        log("Transpose elapsed time in ms: " + watch.elapsed(TimeUnit.MILLISECONDS));
     }
 
     private static void log(String s) {
