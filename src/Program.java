@@ -19,13 +19,20 @@ public class Program {
         String dbPassword = "";
 
         String rootDir = System.getProperty("user.dir");
-        String dataFile =  rootDir + "/data/Customers.csv";
+        //String dataFile =  rootDir + "/../../Documents/crucible/RawVolFcst.csv";
+        String dataFile = rootDir + "/data/Customers.csv";
+        String transposedDataFile = rootDir + "/data/Customers_Transposed.csv";
         String outFile = rootDir + "/data/out.csv";
         String createTableQuery = toSqlQueryString(rootDir + "/sqlQueries/createTable.sql");
         String importTableQuery = toSqlQueryString(rootDir + "/sqlQueries/importFileAsTable.sql");
         String queryTable = toSqlQueryString(rootDir + "/sqlQueries/queryTable.sql");
 
         try{
+
+            // transpose the input files.
+            Transposer transposer = new Transposer(dataFile, 4).withOutputFileName(transposedDataFile);
+            transposer.transpose();
+
             // get HSQL DB connection.
             Connection conn = getHSQLDBConnection(inMemHSQLDBUrl, dbUserName, dbPassword);
 
