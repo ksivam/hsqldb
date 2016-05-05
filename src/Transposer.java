@@ -76,24 +76,26 @@ public class Transposer {
 
         // get the non data column as string
         String newTableColumn = joiner.join(columnMetadata.subList(0, dataIndex)) + ",week,val";
+        // write the column metadata
         writer.write(newTableColumn);
         writer.newLine();
+        Logger.log(newTableColumn);
 
         String rowString = null;
         // read each row
-        while((rowString = reader.readLine()) != null){
+        while ((rowString = reader.readLine()) != null) {
             List<String> row = Lists.newArrayList(rowString.split(","));
 
             // validation
-            if(columnMetadata.size() != row.size()) {
-                log("row doesn't match column size: " + rowString);
+            if (columnMetadata.size() != row.size()) {
+                Logger.log("row doesn't match column size: " + rowString);
                 continue;
             }
 
             // get the first row part till the week data
             String outTableRowPart1 = joiner.join(row.subList(0, dataIndex)) + ",";
 
-            for(int i = dataIndex; i < row.size(); i++) {
+            for (int i = dataIndex; i < row.size(); i++) {
                 // transpose the row data into column
                 String outTableRowPart2 = columnMetadata.get(i) + "," + row.get(i);
                 String outTableRow = outTableRowPart1 + outTableRowPart2;
@@ -109,10 +111,6 @@ public class Transposer {
         reader.close();
 
         watch.stop();
-        log("Transpose elapsed time in ms: " + watch.elapsed(TimeUnit.MILLISECONDS));
-    }
-
-    private static void log(String s) {
-        System.out.println(s);
+        Logger.log("Transpose elapsed time in ms: " + watch.elapsed(TimeUnit.MILLISECONDS));
     }
 }

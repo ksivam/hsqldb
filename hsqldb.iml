@@ -12,5 +12,8 @@
     <orderEntry type="library" name="hsqldb-osgi" level="project" />
     <orderEntry type="library" name="sqltool" level="project" />
     <orderEntry type="library" name="guava-19.0" level="project" />
+    <orderEntry type="library" name="hsqldb" level="project" />
+    <orderEntry type="library" name="hsqldb-osgi" level="project" />
+    <orderEntry type="library" name="sqltool" level="project" />
   </component>
 </module>
