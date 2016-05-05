@@ -20,6 +20,19 @@ SELECT lang, week, SUM(TRUNCATE(TO_NUMBER(val),4)) AS val FROM T2 GROUP BY lang,
 ) AS T2
 ON T1.lang = T2.lang AND T1.week = T2.week;
 
+output-files
+-------------
+CREATE TEXT TABLE O1 (lang VARCHAR(255), id VARCHAR(255), week VARCHAR(255), val DECIMAL(18,4));
+set table O1 source '	'
+
+CREATE TEXT TABLE O2 (lang VARCHAR(255), id VARCHAR(255), week VARCHAR(255), val DECIMAL(18,4));
+set table O2 source '/Users/sadasik/Documents/crucible/sandbox/O2.csv'
+
+SET TABLE O1 READONLY FALSE -- to add edit the table data.
+
+SELECT * FROM O1 
+MINUS
+SELECT * FROM O2
 
 RawVolFcst-FollowUpRates
 --------------------------
@@ -39,3 +52,36 @@ INNER JOIN
 SELECT lang, ou, ags, fcstGrp, week, SUM(TRUNCATE(TO_NUMBER(val), 4)) AS val FROM RawVolFcstInput GROUP BY lang, ou, ags, fcstGrp, week
 ) AS RVF
 ON FR.lang = RVF.lang AND FR.ou = RVF.ou AND FR.ags = RVF.ags AND FR.fcstGrp = RVF.fcstGrp AND FR.week = RVF.week
+
+pandas
+------
+Test
+----
+df = pd.read_csv('/Users/sadasik/Documents/crucible/sandbox/O1.csv')
+lang,id,week,val
+df.pivot_table(index=['lang','id'], values='val',columns=['week'])
+o/p
+week         w1   w2
+lang id             
+cn   cn-cn  3.0  4.0
+jp   jp-jp  5.0  6.0
+us   us-us  1.0  2.0
+
+d = {
+'lang' : pd.Series(['us','us', 'cn','cn','jp','jp']),
+'id' : pd.Series(['us-us','us-us', 'cn-cn','cn-cn','jp-jp','jp-jp']),
+'week': pd.Series(['w1','w2', 'w1','w2','w1','w2']),
+'val': pd.Series([1.0,2.0,3.0,4.0,5.,6.0])
+}
+
+df = pd.DataFrame(d)
+
+output
+------
+df = pd.read_csv('/Users/sadasik/Documents/crucible/sandbox/out.csv')
+LANG,OU,AGS,FCSTGRP,STAFFGRP,HNDLMTHD,FCSTGRPID,WEEK,VAL,VALFR,VALRVF
+
+result = df.pivot_table(index=['LANG','OU','AGS','FCSTGRP','STAFFGRP','HNDLMTHD','FCSTGRPID'], values='VAL',columns=['WEEK'])
+result.to_csv('/Users/sadasik/Documents/crucible/sandbox/outTransposed.csv')
+import sys
+result.to_csv(sys.stdout)

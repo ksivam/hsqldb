@@ -31,7 +31,7 @@ public class ConnectionManager {
         statement.executeUpdate(query);
     }
 
-    public static void queryAndSaveOutput(Connection conn, String query, String outFile) throws Exception {
+    public static ResultSet query(Connection conn, String query) throws Exception {
         Statement stmt = conn.createStatement();
         ResultSet result = null;
         try {
@@ -41,7 +41,11 @@ public class ConnectionManager {
             throw ex;
         }
 
-        //printResultSet(result);
+        return result;
+    }
+
+    public static void queryAndSaveOutput(Connection conn, String query, String outFile) throws Exception {
+        ResultSet result = query(conn, query);
 
         FileWriter fileWriter = new FileWriter(outFile);
         CSVWriter csvWriter = new CSVWriter(fileWriter, ',', CSVWriter.NO_QUOTE_CHARACTER);
