@@ -78,10 +78,11 @@ df = pd.DataFrame(d)
 
 output
 ------
-df = pd.read_csv('/Users/sadasik/Documents/crucible/sandbox/out.csv')
+df = pd.read_csv('/Users/sadasik/Documents/crucible/sandbox/1aFollowUpVolOutput.csv')
+df.dtypes : column datatypes
 LANG,OU,AGS,FCSTGRP,STAFFGRP,HNDLMTHD,FCSTGRPID,WEEK,VAL,VALFR,VALRVF
 
 result = df.pivot_table(index=['LANG','OU','AGS','FCSTGRP','STAFFGRP','HNDLMTHD','FCSTGRPID'], values='VAL',columns=['WEEK'])
-result.to_csv('/Users/sadasik/Documents/crucible/sandbox/outTransposed.csv')
+result.to_csv('/Users/sadasik/Documents/crucible/sandbox/1aFollowUpVol.csv')
 import sys
 result.to_csv(sys.stdout)

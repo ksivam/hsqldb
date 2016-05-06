@@ -6,7 +6,7 @@ import java.sql.ResultSet;
  */
 public class FollowUpVolOutput {
     String rootDir = System.getProperty("user.dir");
-    String outFile = rootDir + "/../../Documents/crucible/sandbox/out.csv";
+    String outFile = rootDir + "/../../Documents/crucible/sandbox/1aFollowUpVolOutput.csv";
     String actualOutFile = rootDir + "/../../Documents/crucible/sandbox/qOut.csv";
 
     String followUpVolQuery = ConnectionManager.toSqlQueryString(rootDir + "/sqlQueries/queryTable.sql");

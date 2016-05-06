@@ -38,7 +38,7 @@ public class Program {
 
             FollowUpVolOutput followUpVolOutput = new FollowUpVolOutput();
             followUpVolOutput.run(conn);
-            followUpVolOutput.validate(conn);
+            //followUpVolOutput.validate(conn);
 
             Logger.log("sql query elapsed time in ms: " + watch.elapsed(TimeUnit.MILLISECONDS));
 
