@@ -40,6 +40,9 @@ public class Program {
             followUpVolOutput.run(conn);
             //followUpVolOutput.validate(conn);
 
+            NetworkVolAllocationsInput networkVolAllocationsInput = new NetworkVolAllocationsInput();
+            networkVolAllocationsInput.transpose();
+
             Logger.log("sql query elapsed time in ms: " + watch.elapsed(TimeUnit.MILLISECONDS));
 
         } catch (Exception e){
