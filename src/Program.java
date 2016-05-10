@@ -16,10 +16,11 @@ import java.util.concurrent.TimeUnit;
 public class Program {
 
     public static void main(String[] args){
-        String inMemHSQLDBUrl = "jdbc:hsqldb:mem:mymemdb";
+        //String inMemHSQLDBUrl = "jdbc:hsqldb:file:./db/filedb3;hsqldb.write_delay=true;shutdown=true;hsqldb.sqllog=0;hsqldb.applog=0;hsqldb.log_data=false;hsqldb.log_size=0;";
+        String inMemHSQLDBUrl = "jdbc:hsqldb:mem:mymemdb;hsqldb.write_delay=true;shutdown=true;hsqldb.sqllog=0;hsqldb.applog=0;hsqldb.log_data=false;hsqldb.log_size=0;";
+
         String dbUserName = "sa";
         String dbPassword = "";
-
 
         try{
 
@@ -27,6 +28,8 @@ public class Program {
 
             // get HSQL DB connection.
             Connection conn = ConnectionManager.getHSQLDBConnection(inMemHSQLDBUrl, dbUserName, dbPassword);
+
+            ConnectionManager.setCaseInsensitiveComparisionOnDbLevel(conn);
 
             RawVolFcstInput rawVolFcstInput = new RawVolFcstInput();
             rawVolFcstInput.transpose();
@@ -42,6 +45,10 @@ public class Program {
 
             NetworkVolAllocationsInput networkVolAllocationsInput = new NetworkVolAllocationsInput();
             networkVolAllocationsInput.transpose();
+            networkVolAllocationsInput.run(conn);
+
+            OSNetworkFcstInclTransfersOutput osNetworkFcstInclTransfersOutput = new OSNetworkFcstInclTransfersOutput();
+            osNetworkFcstInclTransfersOutput.run(conn);
 
             Logger.log("sql query elapsed time in ms: " + watch.elapsed(TimeUnit.MILLISECONDS));
 

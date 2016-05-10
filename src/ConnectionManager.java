@@ -76,4 +76,9 @@ public class ConnectionManager {
 
         Logger.log(resultSetAsString);
     }
+
+    public static void setCaseInsensitiveComparisionOnDbLevel(Connection conn) throws SQLException {
+        String query = "SET IGNORECASE TRUE";
+        executeQuery(conn, query);
+    }
 }

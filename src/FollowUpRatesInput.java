@@ -23,6 +23,12 @@ public class FollowUpRatesInput {
         // create the table.
         ConnectionManager.executeQuery(conn, createTableQuery);
 
+        // set the table writable
+        ConnectionManager.executeQuery(conn, "SET TABLE FollowUpRatesInput READONLY FALSE");
+
+        // create table index
+        ConnectionManager.executeQuery(conn, "CREATE INDEX FollowUpRatesInputIndex ON FollowUpRatesInput (lang, ou, ags, fcstGrp, week)");
+
         // import the table.
         ConnectionManager.executeQuery(conn, String.format(importTableQuery, dataFile));
     }
